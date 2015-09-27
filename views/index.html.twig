@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex,nofollow"/>
+    <title>{{ name }} Composer Repository</title>
+
+    <link rel="icon" type="image/png" href="http://cdn.nova.scapp.io/img/favicon.ico"/>
+
+    <link href="//cdn.nova.scapp.io/css/comstrap.min.css" rel="stylesheet" type="text/css"/>
+    <link href="//cdn.nova.scapp.io/css/comstrap-theme.min.css" rel="stylesheet" type="text/css"/>
+    <style>
+    {% include 'styles.css' %}
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a name="navbar-brand" class="navbar-brand">
+                    <img src="//cdn.nova.scapp.io/img/sc_logo.png" alt="">
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-1"></div>
+            <div class="col-md-10">
+                <div class="title">
+                    <h1 style="display:inline">
+                        {% if name %}
+                            {{ name }}
+                        {% else %}
+                            The Composer Repository
+                        {% endif %}
+                    </h1>
+                    <small>
+                        Last updated: <time datetime="{{ "now"|date(constant('\DateTime::ISO8601')) }}">{{ "now"|date(constant('\DateTime::RSS')) }}</time>
+                    </small>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        {% if description %}
+                            <p>{{ description|raw }}</p>
+                        {% endif %}
+                        <p>
+                            Adding the repository to <em>composer.json</em>
+                            <pre><code>{
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "{{ url }}"
+        }
+    ]
+}</code></pre>
+                        </p>
+                        <p>
+                            Find a package:
+                            <input type="text" id="search" class="form-control" autocomplete="off" autofocus placeholder="Enter package name to filter."/>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-1"></div>
+        </div>
+        <div class="row">
+            <div class="col-md-1"></div>
+            <div id="package-list" class="col-md-10">
+                {% for name, package in packages %}
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <h3 id="{{ package.highest.name }}" class="panel-title">{{ package.highest.name }}</h3>
+                        </div>
+                        <div class="panel-body">
+                            {% if package.highest.description %}
+                                <p>{{ package.highest.description }}</p>
+                            {% endif %}
+                        </div>
+                        <table class="table">
+                            {% if package.highest.homepage %}
+                                <tr>
+                                    <th class="col-md-2">Homepage</th>
+                                    <td><a href="{{ package.highest.homepage }}">{{ package.highest.homepage }}</a></td>
+                                </tr>
+                            {% endif %}
+                            {% if package.highest.license %}
+                                <tr>
+                                    <th class="col-md-2">License</th>
+                                    <td>{{ package.highest.license|join(', ') }}</td>
+                                </tr>
+                            {% endif %}
+                            {% if package.highest.authors %}
+                                <tr>
+                                    <th class="col-md-2">Authors</th>
+                                    <td>
+                                        {% for author in package.highest.authors %}
+                                            {%- if author.homepage -%}
+                                                <a href="{{ author.homepage }}">{{ author.name }}</a>
+                                            {%- else -%}
+                                                {{ author.name }}
+                                            {%- endif -%}
+                                            {%- if not loop.last -%}, {% endif -%}
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                            {% endif %}
+                            {% if package.highest.support %}
+                            <tr>
+                                <th class="col-md-2">Support</th>
+                                <td>
+                                    <ul>
+                                    {% for support_type, support_url in package.highest.support %}
+                                        <li>{{ support_type|capitalize }}: <a href="{{ support_url }}">{{ support_url }}</a></li>
+                                    {% endfor %}
+                                    </ul>
+                                </tr>
+                            </td>
+                            {% endif %}
+                            <tr>
+                                <th class="col-md-2">Releases</th>
+                                <td>
+                                    {% for version in package.versions %}
+                                        {%- if version.distType -%}
+                                            <a href="{{ version.distUrl }}" title="{{ version.distReference }}">{{ version.prettyVersion }}</a>
+                                        {%- else -%}
+                                            <a href="{{ version.sourceUrl }}" title="{{ version.sourceReference }}">{{ version.prettyVersion }}</a>
+                                        {%- endif -%}
+                                        {%- if not loop.last -%}, {% endif -%}
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="col-md-2">Required by</th>
+                                <td>
+                                    {% set package_dependencies = attribute(dependencies, name) %}
+                                    {% if package_dependencies|length %}
+                                        <ul>
+                                            {% for dependency in package_dependencies %}
+                                                <li><a href="#{{ dependency }}">{{ dependency }}</a></li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="col-md-1"></div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container-fluid">
+            <p><small>
+                This Composer Repository is proudly powered by <a href="https://github.com/composer/satis">Satis</a> {{ constant('Composer\\Satis\\Satis::VERSION') }}
+                -
+                Last updated: {{ "now"|date(constant('\DateTime::ISO8601')) }}</small></p>
+        </div>
+    </footer>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment-with-locales.min.js"></script>
+    <script src="//cdn.nova.scapp.io/js/comstrap.min.js"></script>
+    <script>
+    $(function(){
+        var packages = $('h3');
+        var timer;
+        $('input#search').keyup(function(){
+            clearTimeout(timer);
+            var ms = 350; // milliseconds
+            var needle = $(this).val().toLowerCase(), show;
+            timer = setTimeout(function() {
+                $('#package-list').hide();
+                packages.each(function(){
+                    show = $(this).text().toLowerCase().indexOf(needle) != -1;
+                    $(this).parent().parent().toggle(show);
+                });
+                $('#package-list').show();
+            }, ms);
+        }).focus();
+        $('input#search').change(function(){
+            window.location.hash = "!/" + $(this).val().toLowerCase();
+        });
+        $(window).on("hashchange", function() {
+            var $input = $('input#search');
+            if (window.location.hash.indexOf("#!/") == 0) {
+                $input.val(window.location.hash.replace(/#!\//,"").toLowerCase());
+                $input.trigger("keyup");
+            } else {
+                var $anchor = $("h3[id='"+window.location.hash.replace(/^#/,"")+"']");
+                if ($anchor.length != $anchor.filter(":visible").length) {
+                    $input.val("").trigger("keyup");
+                    $anchor.get(0).scrollIntoView();
+                }
+            }
+        });
+        $(window).trigger("hashchange");
+        var $lastUpdate = $('#lastupdate time');
+        function updateDate() {
+            $lastUpdate.text(moment('{{ "now"|date(constant('\DateTime::ISO8601')) }}').fromNow());
+        }
+        setInterval(updateDate, 5000);
+        updateDate();
+    });
+    </script>
+</body>
+</html>

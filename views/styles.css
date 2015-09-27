@@ -1,0 +1,14 @@
+html {
+    position: relative;
+    min-height: 100%;
+}
+body {
+    /* Margin top by nav height */
+    margin-top: 60px;
+}
+.title {
+    padding-bottom: 5px;
+}
+.title h1 {
+    display: inline;
+}
