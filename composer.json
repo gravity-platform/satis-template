@@ -1,0 +1,13 @@
+{
+    "name": "gravity-platform/satis-template",
+    "description": "Comstrap template for satis repos.",
+    "type": "library",
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "Lucas Bickel",
+            "email": "lucas.bickel@swisscom.com"
+        }
+    ],
+    "require": {}
+}
