@@ -37,7 +37,7 @@
                         {% endif %}
                     </h1>
                     <small>
-                        Last updated: <time datetime="{{ "now"|date(constant('\DateTime::ISO8601')) }}">{{ "now"|date(constant('\DateTime::RSS')) }}</time>
+                        Last updated: <time class="lastupdate" datetime="{{ "now"|date(constant('\DateTime::ISO8601')) }}">{{ "now"|date(constant('\DateTime::RSS')) }}</time>
                     </small>
                 </div>
                 <div class="panel panel-default">
@@ -198,7 +198,7 @@
             }
         });
         $(window).trigger("hashchange");
-        var $lastUpdate = $('#lastupdate time');
+        var $lastUpdate = $('time.lastupdate');
         function updateDate() {
             $lastUpdate.text(moment('{{ "now"|date(constant('\DateTime::ISO8601')) }}').fromNow());
         }
